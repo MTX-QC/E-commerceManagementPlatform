@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--status:Log4j2内部日志的输出级别,设置为TRACE对学习Log4j2非常有用 -->
+<!--monitorInterval:定时检测配置文件的修改,有变化则自动重新加载配置,时间单位为秒,最小间隔为5s -->
+<Configuration status="fatal" >
+    <properties>
+        <property name="baseDir" value="D:\1.New start\Java\SpringBoot\logs"/>
+    </properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--控制台只输出level及以上级别的信息(onMatch)，其他的直接拒绝(onMismatch) -->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level [%L] - %msg%n" />
+        </Console>
+        <!--debug级别日志文件输出-->
+        <RollingFile name="debug_appender" fileName="${baseDir}/debug.log"
+                     filePattern="${baseDir}/debug_%i.log.%d{yyyy-MM-dd}">
+            <!--过滤器-->
+            <Filters>
+                <!--限制日志级别再debug及以上再info以下-->
+                <ThresholdFilter level="debug"/>
+                <ThresholdFilter level="info" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <!--日志格式-->
+            <PatternLayout pattern="[%d{HH:mm:ss.SSS} [%P] - %L - %m%n" />
+            <!--Policies:触发策略 -->
+            <Policies>
+                <!--每隔一天转存 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <!--SizeBasedTriggeringPolicy:日志文件按照大小备份 -->
+                <!--size:指定日志文件最大为100MB，单位可以为KB、MB或GB -->
+                <SizeBasedTriggeringPolicy size="100MB" />
+            </Policies>
+        </RollingFile>
+
+        <!--info级别日志文件输出-->
+        <RollingFile name="info_appender" fileName="${baseDir}/info.log"
+                     filePattern="${baseDir}/info_%i.log.%d{yyyy-MM-dd}">
+            <!--过滤器-->
+            <Filters>
+                <!--限制日志级别再info及以上再error以下-->
+                <ThresholdFilter level="info"/>
+                <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <!--日志格式-->
+            <PatternLayout pattern="[%d{HH:mm:ss.SSS} [%P] - %L - %m%n" />
+            <!--Policies:触发策略 -->
+            <Policies>
+                <!--每隔一天转存 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <!--SizeBasedTriggeringPolicy:日志文件按照大小备份 -->
+                <!--size:指定日志文件最大为100MB，单位可以为KB、MB或GB -->
+                <SizeBasedTriggeringPolicy size="100MB" />
+            </Policies>
+        </RollingFile>
+
+        <!--error级别日志文件输出-->
+        <RollingFile name="error_appender" fileName="${baseDir}/error.log"
+                     filePattern="${baseDir}/error_%i.log.%d{yyyy-MM-dd}">
+            <!--过滤器-->
+            <Filters>
+                <!--限制日志级别在error及以上-->
+                <ThresholdFilter level="error"/>
+            </Filters>
+            <!--日志格式-->
+            <PatternLayout pattern="[%d{HH:mm:ss.SSS} [%P] - %L - %m%n" />
+            <!--Policies:触发策略 -->
+            <Policies>
+                <!--每隔一天转存 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <!--SizeBasedTriggeringPolicy:日志文件按照大小备份 -->
+                <!--size:指定日志文件最大为100MB，单位可以为KB、MB或GB -->
+                <SizeBasedTriggeringPolicy size="100MB" />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="debug_appender" />
+            <AppenderRef ref="info_appender" />
+            <AppenderRef ref="error_appender" />
+        </Root>
+    </Loggers>
+</Configuration>
