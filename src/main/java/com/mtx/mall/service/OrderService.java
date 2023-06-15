@@ -3,8 +3,10 @@ package com.mtx.mall.service;
 import com.github.pagehelper.PageInfo;
 import com.mtx.mall.model.request.CreateOrderReq;
 import com.mtx.mall.model.vo.CartVO;
+import com.mtx.mall.model.vo.OrderStatisticsVO;
 import com.mtx.mall.model.vo.OrderVO;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,7 +26,7 @@ public interface OrderService {
     void cancel(String orderNo);
 
     //生成支付二维码
-    String grcode(String orderNo);
+    String qrcode(String orderNo);
 
     //支付接口
     void pay(String orderNo);
@@ -37,4 +39,6 @@ public interface OrderService {
 
     //完结订单
     void finish(String orderNo);
+
+    List<OrderStatisticsVO> statistics(Date startDate, Date endDate);
 }

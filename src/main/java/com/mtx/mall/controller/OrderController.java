@@ -51,7 +51,7 @@ public class OrderController {
     @PostMapping("order/grcode")
     @ApiOperation("生成支付二维码")
     public ApiRestResponse grcode(@RequestParam String orderNo) {
-        String pngAddress = orderService.grcode(orderNo);
+        String pngAddress = orderService.qrcode(orderNo);
         return ApiRestResponse.success(pngAddress);
     }
     @GetMapping("pay")

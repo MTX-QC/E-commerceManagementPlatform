@@ -14,9 +14,11 @@ import com.mtx.mall.model.dao.ProductMapper;
 import com.mtx.mall.model.pojo.Order;
 import com.mtx.mall.model.pojo.OrderItem;
 import com.mtx.mall.model.pojo.Product;
+import com.mtx.mall.model.query.OrderStatisticsQuery;
 import com.mtx.mall.model.request.CreateOrderReq;
 import com.mtx.mall.model.vo.CartVO;
 import com.mtx.mall.model.vo.OrderItemVO;
+import com.mtx.mall.model.vo.OrderStatisticsVO;
 import com.mtx.mall.model.vo.OrderVO;
 import com.mtx.mall.service.CartService;
 import com.mtx.mall.service.OrderService;
@@ -34,8 +36,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,9 +58,8 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     UserService userService;
 
-    @Value("${file.upload.ip}")
-    String ip;
-
+   @Value("${file.upload.uri}")
+    String uri;
     //数据库事务
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -184,13 +183,13 @@ public class OrderServiceImpl implements OrderService {
             order.setEndTime(new Date());
             orderMapper.updateByPrimaryKeySelective(order);
         }else {
-            throw new MtxMallException(MtxMallExceptionEnum.WRONG_ORDER_STATUS);
+            throw new MtxMallException(MtxMallExceptionEnum.CANCEL_WRONG_ORDER_STATUS);
         }
     }
 
     //生成支付二维码
     @Override
-    public String grcode(String orderNo){
+    public String qrcode(String orderNo){
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
@@ -206,7 +205,7 @@ public class OrderServiceImpl implements OrderService {
         *//**********************************************************//*
         */
 
-        String address = ip + ":" + request.getLocalPort();
+        String address = uri;
         String payUrl = "http://" + address + "/pay?orderNo= " + orderNo;
 
         try {
@@ -264,7 +263,7 @@ public class OrderServiceImpl implements OrderService {
             order.setDeliveryTime(new Date());
             orderMapper.updateByPrimaryKeySelective(order);
         } else {
-            throw new MtxMallException(MtxMallExceptionEnum.WRONG_ORDER_STATUS);
+            throw new MtxMallException(MtxMallExceptionEnum.DELIVER_WRONG_ORDER_STATUS);
         }
     }
 
@@ -288,7 +287,7 @@ public class OrderServiceImpl implements OrderService {
             order.setEndTime(new Date());
             orderMapper.updateByPrimaryKeySelective(order);
         } else {
-            throw new MtxMallException(MtxMallExceptionEnum.WRONG_ORDER_STATUS);
+            throw new MtxMallException(MtxMallExceptionEnum.FINISH_WRONG_ORDER_STATUS);
         }
     }
 
@@ -363,6 +362,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    @Override
+    public List<OrderStatisticsVO> statistics(Date startDate, Date endDate){
+        OrderStatisticsQuery orderStatisticsQuery = new OrderStatisticsQuery();
+        orderStatisticsQuery.setStartDate(startDate);
+        orderStatisticsQuery.setEndDate(endDate);
+        List<OrderStatisticsVO> orderStatisticsVOS = orderMapper.selectOrderStatistics(orderStatisticsQuery);
+        return orderStatisticsVOS;
+    }
 
 
 

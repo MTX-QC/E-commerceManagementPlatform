@@ -238,7 +238,6 @@
     <result column="days" jdbcType="TIMESTAMP" property="days"/>
     <result column="amount" jdbcType="INTEGER" property="amount"/>
   </resultMap>
-
   <select id="selectOrderStatistics" resultMap="listOrderStatisticsMap">
     select date_format(from_unixtime(UNIX_TIMESTAMP(create_time)), "%Y-%m-%d")
     as days, count(*) as amount
@@ -254,4 +253,6 @@
     group by days
     order by days
   </select>
+
+
 </mapper>

@@ -2,13 +2,18 @@ package com.mtx.mall.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.mtx.mall.common.ApiRestResponse;
+import com.mtx.mall.model.vo.OrderStatisticsVO;
 import com.mtx.mall.service.OrderService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+import java.util.List;
 
 /*
  * 描述：  订单后台管理Controller
@@ -50,6 +55,14 @@ public class OrderAdminController {
     public ApiRestResponse finish(@RequestParam String orderNo){
         orderService.finish(orderNo);
         return ApiRestResponse.success();
+    }
+
+    @GetMapping("admin/order/statistics")
+    @ApiOperation("每日订单量统计")
+    public ApiRestResponse statistics(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+                                      @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate){
+        List<OrderStatisticsVO> statistics = orderService.statistics(startDate, endDate);
+        return ApiRestResponse.success(statistics);
     }
 
 }
