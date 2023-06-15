@@ -1,7 +1,7 @@
 package com.mtx.mall.model.dao;
 
 import com.mtx.mall.model.pojo.User;
-import org.springframework.data.repository.query.Param;
+import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper {
     int deleteByPrimaryKey(Integer id);
