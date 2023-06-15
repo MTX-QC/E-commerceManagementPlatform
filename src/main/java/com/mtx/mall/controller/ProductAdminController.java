@@ -10,12 +10,15 @@ import com.mtx.mall.model.request.AddProductReq;
 import com.mtx.mall.model.request.UpdateProductReq;
 import com.mtx.mall.service.ProductService;
 import io.swagger.annotations.ApiOperation;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.File;
@@ -38,7 +41,7 @@ public class ProductAdminController {
         return ApiRestResponse.success();
     }
     @PostMapping("admin/upload/file")
-    @ApiOperation("上传商品文件")
+    @ApiOperation("上传商品图片")
     public ApiRestResponse upload(HttpServletRequest httpServletRequest,
                                   @RequestParam("file") MultipartFile file){
         String filename = file.getOriginalFilename();
@@ -49,16 +52,7 @@ public class ProductAdminController {
         //创建文件
         File fileDirectory = new File(Constant.FILE_UPLOAD_DIR);
         File destFile = new File(Constant.FILE_UPLOAD_DIR + newFileName);
-        if (!fileDirectory.exists()){
-            if (!fileDirectory.mkdir()){
-                throw new MtxMallException(MtxMallExceptionEnum.MKDIR_FAILED);
-            }
-        }
-        try {
-            file.transferTo(destFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        createFile(file, fileDirectory, destFile);
         try {
             return ApiRestResponse.success(getHost(new URI
                     (httpServletRequest.getRequestURI() + ""))+"/images/" + newFileName);
@@ -112,7 +106,7 @@ public class ProductAdminController {
 
     @ApiOperation("后台批量上传商品接口")
     @PostMapping("admin/upload/product")
-    public ApiRestResponse uploadProduct(@RequestParam("file") MultipartFile multipartFile) {
+    public ApiRestResponse uploadProduct(@RequestParam("file") MultipartFile multipartFile) throws IOException {
         String fileName = multipartFile.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
         //生成uuid
@@ -121,17 +115,46 @@ public class ProductAdminController {
         //创建文件
         File fileDirectory = new File(Constant.FILE_UPLOAD_DIR);
         File destFile = new File(Constant.FILE_UPLOAD_DIR + newFileName);
+        createFile(multipartFile, fileDirectory, destFile);
+        productService.addProductByExcel(destFile);
+        return ApiRestResponse.success();
+    }
+    @PostMapping("admin/upload/image")
+    @ApiOperation("对图片的编辑")
+    public ApiRestResponse uploadImage(HttpServletRequest httpServletRequest,
+                                  @RequestParam("file") MultipartFile file) throws IOException {
+        String filename = file.getOriginalFilename();
+        String suffixName = filename.substring(filename.lastIndexOf("."));
+        //生成文件名称UUID
+        UUID uuid = UUID.randomUUID();
+        String newFileName = uuid.toString() + suffixName;
+        //创建文件
+        File fileDirectory = new File(Constant.FILE_UPLOAD_DIR);
+        File destFile = new File(Constant.FILE_UPLOAD_DIR + newFileName);
+        createFile(file, fileDirectory, destFile);
+        Thumbnails.of(destFile).size(Constant.IMAGE_SIZE,Constant.IMAGE_SIZE).watermark(Positions.BOTTOM_RIGHT,
+                ImageIO.read(new File(Constant.FILE_UPLOAD_DIR + Constant.WATER_MARK_JPG)),Constant.IMAGE_OPACITY).
+                toFile(new File(Constant.FILE_UPLOAD_DIR + newFileName));
+        try {
+            return ApiRestResponse.success(getHost(new URI
+                    (httpServletRequest.getRequestURI() + ""))+"/images/" + newFileName);
+        } catch (URISyntaxException e) {
+            return ApiRestResponse.error(MtxMallExceptionEnum.UPLOAD_FAILED);
+        }
+    }
+
+    private static void createFile(MultipartFile file, File fileDirectory, File destFile) {
         if (!fileDirectory.exists()){
             if (!fileDirectory.mkdir()){
                 throw new MtxMallException(MtxMallExceptionEnum.MKDIR_FAILED);
             }
         }
         try {
-            multipartFile.transferTo(destFile);
+            file.transferTo(destFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        productService.
-        return ApiRestResponse.success();
     }
+
+
 }

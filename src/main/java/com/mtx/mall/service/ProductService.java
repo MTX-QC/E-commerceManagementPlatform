@@ -7,6 +7,8 @@ import com.mtx.mall.model.request.ProductListReq;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,4 +30,6 @@ public interface ProductService {
     Product detail(Integer id);
 
     PageInfo list(ProductListReq productListReq);
+
+    void addProductByExcel(File destFile) throws IOException;
 }

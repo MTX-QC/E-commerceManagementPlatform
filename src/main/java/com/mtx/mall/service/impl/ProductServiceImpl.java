@@ -13,6 +13,9 @@ import com.mtx.mall.model.request.ProductListReq;
 import com.mtx.mall.model.vo.CategoryVO;
 import com.mtx.mall.service.CategoryService;
 import com.mtx.mall.service.ProductService;
+import com.mtx.mall.util.ExcelUtil;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -24,7 +27,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -209,19 +211,36 @@ public class ProductServiceImpl implements ProductService {
 
 
     /*
-    * 编写中~~~~~~~~
+    * 读取Excel中内容，并写入数据库
     * */
-
-    public void addProductByExcel(File destFile) {
-
+    @Override
+    public void addProductByExcel(File destFile) throws IOException {
+        List<Product> products = readProductsFromExcel(destFile);
+        for (int i = 0; i < products.size(); i++) {
+            Product product = products.get(i);
+            Product productOld = productMapper.selectByName(product.getName());
+            if (productOld != null){
+                throw new MtxMallException(MtxMallExceptionEnum.NAME_EXISTED);
+            }
+            int count = productMapper.insertSelective(product);
+            if (count == 0){
+                throw new MtxMallException(MtxMallExceptionEnum.CREATE_FAILED);
+            }
+        }
     }
 
+    /*
+    * 读取Excel中内容
+    * */
     private List<Product> readProductsFromExcel(File excelFile) throws IOException {
         ArrayList<Product> listProducts = new ArrayList<>();
         FileInputStream inputStream = new FileInputStream(excelFile);
 
-        XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-        XSSFSheet firstSheet = workbook.getSheetAt(0);
+        //用HSSFWorkbook,后缀为.xls(测试通过)
+        //用FSSFWorkbook,后缀为.xlsx(这个测试没通过，一直报错，提示后缀的问题)，
+        //使用这个方法需要可客户进行约定
+        HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+        HSSFSheet firstSheet = workbook.getSheetAt(0);
         Iterator<Row> iterator = firstSheet.iterator();
         while (iterator.hasNext()){
             Row nextRow = iterator.next();
@@ -231,12 +250,45 @@ public class ProductServiceImpl implements ProductService {
             while (cellIterator.hasNext()){
                 Cell nextCell = cellIterator.next();
                 int columnIndex = nextCell.getColumnIndex();
+
+                switch (columnIndex){
+                    case 0:
+                        aProduct.setName((String) ExcelUtil.getCellValue(nextCell));
+                        break;
+                    case 1:
+                        aProduct.setImage((String) ExcelUtil.getCellValue(nextCell));
+                        break;
+                    case 2:
+                        aProduct.setDetail((String) ExcelUtil.getCellValue(nextCell));
+                        break;
+                    case 3:
+                        //数据的一般处理方法
+                        Double cellValue = (Double) ExcelUtil.getCellValue(nextCell);
+                        aProduct.setCategoryId(cellValue.intValue());
+                        break;
+                    case 4:
+                        cellValue = (Double) ExcelUtil.getCellValue(nextCell);
+                        aProduct.setPrice(cellValue.intValue());
+                        break;
+                    case 5:
+                        cellValue = (Double) ExcelUtil.getCellValue(nextCell);
+                        aProduct.setStock(cellValue.intValue());
+                        break;
+                    case 6:
+                        cellValue = (Double) ExcelUtil.getCellValue(nextCell);
+                        aProduct.setStatus(cellValue.intValue());
+                        break;
+                    default:
+                        break;
+                }
             }
+            listProducts.add(aProduct);
         }
-        return null;
+        workbook.close();
+        inputStream.close();
+        return listProducts;
     }
 
-    ////123
 
 }
 
