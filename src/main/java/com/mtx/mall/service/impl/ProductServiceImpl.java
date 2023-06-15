@@ -68,7 +68,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void update(Product updateProduct) {
         Product productOld = productMapper.selectByName(updateProduct.getName());
-
         //同名且不同id，不能继续修改
         if (productOld != null && !productOld.getId().equals(updateProduct.getId())) {
             throw new MtxMallException(MtxMallExceptionEnum.NAME_EXISTED);

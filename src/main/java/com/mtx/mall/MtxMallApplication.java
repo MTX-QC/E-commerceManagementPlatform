@@ -15,7 +15,8 @@ import java.util.TimeZone;
 public class MtxMallApplication {
 
     public static void main(String[] args) {
-        System.out.println(TimeZone.getDefault());
+//        查看当前项目的时区
+//        System.out.println(TimeZone.getDefault());
         SpringApplication.run(MtxMallApplication.class, args);
     }
 
