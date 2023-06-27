@@ -6,12 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 描述： Admin过滤器的配置
+ * 描述：     Admin过滤器的配置
  */
 @Configuration
 public class AdminFilterConfig {
+
     @Bean
-    public AdminFilter adminFilter(){
+    public AdminFilter adminFilter() {
         return new AdminFilter();
     }
 
@@ -25,5 +26,4 @@ public class AdminFilterConfig {
         filterRegistrationBean.setName("adminFilterConf");
         return filterRegistrationBean;
     }
-
 }

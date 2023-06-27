@@ -17,10 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -30,6 +27,7 @@ import java.util.List;
  * 描述：    目录Controller
  * */
 @Controller
+//@CrossOrigin(origins = "http://localhost:8080", methods = {RequestMethod.POST, RequestMethod.GET, RequestMethod.OPTIONS})
 public class CategoryController {
     @Autowired
     UserService userService;
@@ -100,9 +98,10 @@ public class CategoryController {
      * 后台目录列表
      * */
     @ApiOperation("后台目录列表")
-    @PostMapping("admin/category/list")
+    @GetMapping("admin/category/list")
     @ResponseBody
-    public ApiRestResponse listCategoryForAdmin(@RequestParam Integer pageNum, @RequestParam Integer pageSize){
+    public ApiRestResponse listCategoryForAdmin(@RequestParam Integer pageNum,
+                                                @RequestParam Integer pageSize) {
         PageInfo pageInfo = categoryService.listForAdmin(pageNum, pageSize);
         return ApiRestResponse.success(pageInfo);
     }
@@ -110,9 +109,9 @@ public class CategoryController {
      * 前台目录列表
      * */
     @ApiOperation("前台目录列表")
-    @PostMapping("category/list")
+    @GetMapping("category/list")
     @ResponseBody
-    public ApiRestResponse listCategoryForAdmin(){
+    public ApiRestResponse listCategoryForCustomer() {
         List<CategoryVO> categoryVOS = categoryService.listCategoryForCustomer(0);
         return ApiRestResponse.success(categoryVOS);
     }

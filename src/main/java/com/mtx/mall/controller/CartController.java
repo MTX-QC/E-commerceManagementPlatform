@@ -5,20 +5,18 @@ import com.mtx.mall.filter.UserFilter;
 import com.mtx.mall.model.vo.CartVO;
 import com.mtx.mall.service.CartService;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-/*
- * 描述：   购物车Controller
- *
- * */
-
+/**
+ * 描述：     购物车Controller
+ */
 @RestController
+//@CrossOrigin(origins = "http://localhost:8080", allowCredentials = "true", methods = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
 @RequestMapping("/cart")
 public class CartController {
+
     @Autowired
     CartService cartService;
 
@@ -30,7 +28,6 @@ public class CartController {
         return ApiRestResponse.success(cartList);
     }
 
-
     @PostMapping("/add")
     @ApiOperation("添加商品到购物车")
     public ApiRestResponse add(@RequestParam Integer productId, @RequestParam Integer count) {
@@ -38,11 +35,11 @@ public class CartController {
         return ApiRestResponse.success(cartVOList);
     }
 
-
     @PostMapping("/update")
     @ApiOperation("更新购物车")
     public ApiRestResponse update(@RequestParam Integer productId, @RequestParam Integer count) {
-        List<CartVO> cartVOList = cartService.update(UserFilter.userThreadLocal.get().getId(), productId, count);
+        List<CartVO> cartVOList = cartService
+                .update(UserFilter.userThreadLocal.get().getId(), productId, count);
         return ApiRestResponse.success(cartVOList);
     }
 
@@ -55,17 +52,20 @@ public class CartController {
     }
 
     @PostMapping("/select")
-    @ApiOperation("选中/不选中购物车的某商品")
+    @ApiOperation("选择/不选择购物车的某商品")
     public ApiRestResponse select(@RequestParam Integer productId, @RequestParam Integer selected) {
-        List<CartVO> cartVOList = cartService.selectOrNot(UserFilter.userThreadLocal.get().getId(), productId,selected);
+        //不能传入userID，cartID，否则可以删除别人的购物车
+        List<CartVO> cartVOList = cartService
+                .selectOrNot(UserFilter.userThreadLocal.get().getId(), productId, selected);
         return ApiRestResponse.success(cartVOList);
     }
 
     @PostMapping("/selectAll")
-    @ApiOperation("全选中/全不选中购物车的某商品")
+    @ApiOperation("全选择/全不选择购物车的某商品")
     public ApiRestResponse selectAll(@RequestParam Integer selected) {
-        //不能传入userID,cartID,
-        List<CartVO> cartVOList = cartService.selectAllOrNot(UserFilter.userThreadLocal.get().getId(),selected);
+        //不能传入userID，cartID，否则可以删除别人的购物车
+        List<CartVO> cartVOList = cartService
+                .selectAllOrNot(UserFilter.userThreadLocal.get().getId(), selected);
         return ApiRestResponse.success(cartVOList);
     }
 }

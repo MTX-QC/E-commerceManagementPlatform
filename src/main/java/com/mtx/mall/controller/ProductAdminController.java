@@ -12,31 +12,25 @@ import com.mtx.mall.model.request.UpdateProductReq;
 import com.mtx.mall.service.ProductService;
 import com.mtx.mall.service.UploadService;
 import io.swagger.annotations.ApiOperation;
-import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.geometry.Positions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.UUID;
+
 
 /*
  * 描述： 后台商品管理Controller
  * */
 @RestController
 @Validated
+//@CrossOrigin(origins = "http://localhost:8080", allowCredentials = "true", methods = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
 public class ProductAdminController {
     @Autowired
     ProductService productService;
@@ -83,8 +77,8 @@ public class ProductAdminController {
         return ApiRestResponse.success();
     }
 
-    @ApiOperation("后台商品列表")
-    @PostMapping("admin/product/list")
+    @ApiOperation("后台商品列表接口")
+    @GetMapping("/admin/product/list")
     public ApiRestResponse list(@RequestParam Integer pageNum,
                                 @RequestParam Integer pageSize) {
         PageInfo pageInfo = productService.listForAdmin(pageNum, pageSize);

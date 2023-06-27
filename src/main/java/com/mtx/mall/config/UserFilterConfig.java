@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 描述： User过滤器的配置
+ * 描述：     User过滤器的配置
  */
 @Configuration
 public class UserFilterConfig {
-    public static ThreadLocal<User> userThreadLocal = new ThreadLocal();
+
     @Bean
-    public UserFilter userFilter(){
+    public UserFilter userFilter() {
         return new UserFilter();
     }
 
@@ -28,5 +28,4 @@ public class UserFilterConfig {
         filterRegistrationBean.setName("userFilterConf");
         return filterRegistrationBean;
     }
-
 }

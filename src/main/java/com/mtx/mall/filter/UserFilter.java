@@ -11,21 +11,24 @@ import com.mtx.mall.exception.MtxMallException;
 import com.mtx.mall.exception.MtxMallExceptionEnum;
 import com.mtx.mall.model.pojo.User;
 import com.mtx.mall.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
-
-import javax.servlet.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.PrintWriter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 /**
- * 用户过滤器
- * */
-
+ * 描述：     用户过滤器
+ */
 public class UserFilter implements Filter {
 
     public static ThreadLocal<User> userThreadLocal = new ThreadLocal();
@@ -43,8 +46,11 @@ public class UserFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
+
         if ("OPTIONS".equals(request.getMethod())) {
+            System.out.println("我放了OPTIONS");
             filterChain.doFilter(servletRequest, servletResponse);
+
         } else {
             String token = request.getHeader(Constant.JWT_TOKEN);
             if (StringUtils.isEmpty(token)) {

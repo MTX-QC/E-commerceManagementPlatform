@@ -12,13 +12,12 @@ import org.springframework.data.repository.query.Param;
 public interface UserService {
     User getUser();
 
-    void register(String username,String password,String emailAddress) throws MtxMallException;
+    void register(String userName, String password, String emailAddress) throws MtxMallException;
 
-    User login(String userName,String password) throws MtxMallException;
+    User login(String userName, String password) throws MtxMallException;
 
     void updateInformation(User user) throws MtxMallException;
 
-    //判断登录的是否是管理员
     boolean checkAdminRole(User user);
 
     boolean checkEmailRegistered(String emailAddress);

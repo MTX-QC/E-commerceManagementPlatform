@@ -9,24 +9,27 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /*
  * 描述：  订单Controller
  * */
 @RestController
+//@CrossOrigin(origins = "http://localhost:8080", allowCredentials = "true", methods = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
 public class OrderController {
     @Autowired
     OrderService orderService;
 
     @PostMapping("order/create")
     @ApiOperation("创建订单")
-    public ApiRestResponse create(@RequestBody CreateOrderReq createOrderReq) {
+    public ApiRestResponse create(@RequestBody @Valid CreateOrderReq createOrderReq) {
         String orderNo = orderService.create(createOrderReq);
         return ApiRestResponse.success(orderNo);
     }
 
     @GetMapping("order/detail")
     @ApiOperation("前台订单详情")
-    public ApiRestResponse detail(@RequestParam String orderNo){
+    public ApiRestResponse detail(@RequestParam String orderNo) {
         OrderVO orderVO = orderService.detail(orderNo);
         return ApiRestResponse.success(orderVO);
     }
@@ -38,22 +41,26 @@ public class OrderController {
         return ApiRestResponse.success(pageInfo);
     }
 
+    /**
+     * 订单取消
+     */
     @PostMapping("order/cancel")
     @ApiOperation("前台取消订单")
     public ApiRestResponse cancel(@RequestParam String orderNo) {
-       orderService.cancel(orderNo);
+        orderService.cancel(orderNo);
         return ApiRestResponse.success();
     }
 
-    /*
-    * 生成支付二维码
-    * */
-    @PostMapping("order/grcode")
+    /**
+     * 生成支付二维码
+     */
+    @GetMapping("order/qrcode")
     @ApiOperation("生成支付二维码")
-    public ApiRestResponse grcode(@RequestParam String orderNo) {
+    public ApiRestResponse qrcode(@RequestParam String orderNo) {
         String pngAddress = orderService.qrcode(orderNo);
         return ApiRestResponse.success(pngAddress);
     }
+
     @GetMapping("pay")
     @ApiOperation("支付接口")
     public ApiRestResponse pay(@RequestParam String orderNo) {
